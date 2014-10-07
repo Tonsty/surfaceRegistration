@@ -1,0 +1,18 @@
+# vtk DataFile Version 2.0
+limnPolyData
+ASCII
+DATASET POLYDATA
+POINTS 6 float
+1.51 0.67 0.16
+1.82 0.65 0.25
+1.63 0.34 0.34
+1.14 0.23 0.43
+1.25 0.81 0.52
+1.66 0.32 0.61
+
+POLYGONS 5 20
+3 0 1 5
+3 2 0 5
+3 3 2 5
+3 4 3 5
+3 1 4 5
