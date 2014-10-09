@@ -9,12 +9,12 @@
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 
-vtkSmartPointer<vtkPolyData> TransformScaleTranslate(vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkPolyData> polydata, double value);
+vtkSmartPointer<vtkPolyData> TransformScaleTranslate(vtkSmartPointer<vtkPolyData> polydata, double value);
 
 vtkSmartPointer<vtkOctreePointLocator> buildOctree(vtkSmartPointer<vtkPolyData> newdata, vtkSmartPointer<vtkPoints> points,
                                                    vtkSmartPointer<vtkPolyData> olddata);
 
-double preProcessingStep(int pointCountTarget, int pointCountTemplate,
+double applyPCA(int pointCountTarget, int pointCountTemplate,
                                 vtkSmartPointer<vtkPolyData> dataTarget, vtkSmartPointer<vtkPolyData> dataTemplate,
                                 vtkSmartPointer<vtkPolyData> polydataTarget, vtkSmartPointer<vtkPolyData> polydataTemplate, vtkSmartPointer<vtkPolyData> transformedTemplate,
                                 int maxDistance);

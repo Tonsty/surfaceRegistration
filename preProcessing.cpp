@@ -7,7 +7,14 @@ void freeData(double **finalData)
     delete [] finalData;
 }
 
-vtkSmartPointer<vtkPolyData> TransformScaleTranslate(vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkPolyData> polydata, double value)
+double absoluteDouble (double number) {
+    if (number < 0) {
+        return -number;
+    }
+    else return number;
+}
+
+vtkSmartPointer<vtkPolyData> TransformScaleTranslate(vtkSmartPointer<vtkPolyData> polydata, double value)
 {
     vtkSmartPointer<vtkTransform> customTransform = vtkSmartPointer<vtkTransform>::New();
     customTransform->Scale(value, value, value);
@@ -36,7 +43,7 @@ vtkSmartPointer<vtkOctreePointLocator> buildOctree(vtkSmartPointer<vtkPolyData> 
     return octree;
 }
 
-double preProcessingStep(int pointCountTarget, int pointCountTemplate,
+double applyPCA(int pointCountTarget, int pointCountTemplate,
                          vtkSmartPointer<vtkPolyData> dataTarget, vtkSmartPointer<vtkPolyData> dataTemplate,
                          vtkSmartPointer<vtkPolyData> polydataTarget, vtkSmartPointer<vtkPolyData> polydataTemplate, vtkSmartPointer<vtkPolyData> transformedTemplate,
                          int maxDistance) {
@@ -52,8 +59,8 @@ double preProcessingStep(int pointCountTarget, int pointCountTemplate,
     {
         pointsTarget->InsertNextPoint ( finalDataTarget[0][i], finalDataTarget[1][i], finalDataTarget[2][i] );
         for (int j=0; j<3; j++) {
-            if (abs(finalDataTarget[j][i]) > maxCoordinate) {
-                maxCoordinate = abs(finalDataTarget[j][i]);
+            if (absoluteDouble(finalDataTarget[j][i]) > maxCoordinate) {
+                maxCoordinate = absoluteDouble(finalDataTarget[j][i]);
             }
         }
     }
@@ -107,8 +114,8 @@ double preProcessingStep(int pointCountTarget, int pointCountTemplate,
         pointsTemplate->InsertPoint( i, finalDataTemplate[0][i], finalDataTemplate[1][i], finalDataTemplate[2][i] );
         transformedPointsTemplate->InsertPoint( i, finalDataTemplate[0][i], finalDataTemplate[1][i], finalDataTemplate[2][i] );
         for (int j=0; j<3; j++) {
-            if (abs(finalDataTemplate[j][i]) > maxCoordinate) {
-                maxCoordinate = abs(finalDataTemplate[j][i]);
+            if (absoluteDouble(finalDataTemplate[j][i]) > maxCoordinate) {
+                maxCoordinate = absoluteDouble(finalDataTemplate[j][i]);
             }
         }
     }
@@ -117,6 +124,9 @@ double preProcessingStep(int pointCountTarget, int pointCountTemplate,
     freeData(finalDataTemplate);
     
     // Initialization of all polydata
+    
+    polydataTarget->SetPoints(pointsTarget);
+    polydataTarget->SetPolys(dataTarget->GetPolys());
     
     polydataTemplate->SetPoints(pointsTemplate);
     polydataTemplate->SetPolys(dataTemplate->GetPolys());

@@ -130,14 +130,14 @@ int main( int argc, char ** argv )
     vtkSmartPointer<vtkPoints> pointsTemplate = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkPoints> transformedPointsTemplate = vtkSmartPointer<vtkPoints>::New();
     
-    double maxCoordinate = preProcessingStep(pointCountTarget, pointCountTemplate, dataTarget, dataTemplate,
+    double scaleFactor = applyPCA(pointCountTarget, pointCountTemplate, dataTarget, dataTemplate,
                       polydataTarget, polydataTemplate, transformedTemplate, maxDistance);
     
     // Scale to [-1,1] Cube
     
-    polydataTarget = TransformScaleTranslate(pointsTarget, polydataTarget, 1/maxCoordinate);
-    transformedTemplate = TransformScaleTranslate(transformedPointsTemplate, transformedTemplate, 1/maxCoordinate);
-    polydataTemplate = TransformScaleTranslate(pointsTemplate, polydataTemplate, 1/maxCoordinate);
+    polydataTarget = TransformScaleTranslate(polydataTarget, scaleFactor);
+    transformedTemplate = TransformScaleTranslate(transformedTemplate, scaleFactor);
+    polydataTemplate = TransformScaleTranslate(polydataTemplate, scaleFactor);
     
     pointsTarget = polydataTarget->GetPoints();
     pointsTemplate = polydataTemplate->GetPoints();
