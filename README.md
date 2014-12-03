@@ -10,3 +10,6 @@ http://eigen.tuxfamily.org/
 
 Visualization Toolkit (VTK) 5.10.1 (with the last commit it works with 6.1.0)
 http://www.vtk.org/
+
+Boost C++ Libraries 1.57.0
+http://www.boost.org/
