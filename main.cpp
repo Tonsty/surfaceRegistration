@@ -57,6 +57,19 @@ int SRApplication( InputModes mode, std::string targetName, std::string template
     
     std::cout<< "Duration of conversion: " << duration << " seconds" << std::endl;
     
+    std::cout<< "Printing 100 vertices and all edges to see if correct: " << std::endl;
+    
+    typedef boost::graph_traits<BGLUndirectedGraph>::vertex_descriptor vertex_t;
+    typedef boost::graph_traits<BGLUndirectedGraph>::edge_iterator edge_iter;
+    
+    for (vertex_t v = 0; v < 100; v++)
+        cout << "point " << v << ": " << dataTarget[v].x << " " << dataTarget[v].y << " " << dataTarget[v].z << endl;
+    
+    edge_iter ei, ei_end;
+
+    for (tie(ei, ei_end) = edges(dataTarget); ei != ei_end; ++ei)
+        cout << "(" << source(*ei, dataTarget) << "," << target(*ei, dataTarget) << ") " << endl;
+    
     // Do the PCA to both target and template?
     
     // Scale the meshes?

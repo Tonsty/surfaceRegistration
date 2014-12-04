@@ -20,6 +20,14 @@ BGLUndirectedGraph vtkGetInput (std::string path) {
     
     BGLUndirectedGraph g(V);
     
+    for(int i = 0; i < V; i++) {
+        double point[3];
+        source->GetPolyDataOutput()->GetPoint(i, point);
+        g[i].x = point[0];
+        g[i].y = point[1];
+        g[i].z = point[2];
+    }
+    
     for(int i = 0; i < E; i++)
     {
         vtkSmartPointer<vtkLine> line = vtkLine::SafeDownCast(extractEdges->GetOutput()->GetCell(i));
@@ -48,6 +56,14 @@ BGLUndirectedGraph vtpGetInput (std::string path) {
     const std::size_t E = extractEdges->GetOutput()->GetNumberOfCells();
     
     BGLUndirectedGraph g(V);
+    
+    for(int i = 0; i < V; i++) {
+        double point[3];
+        source->GetOutput()->GetPoint(i, point);
+        g[i].x = point[0];
+        g[i].y = point[1];
+        g[i].z = point[2];
+    }
     
     for(int i = 0; i < E; i++)
     {

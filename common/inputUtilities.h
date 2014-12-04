@@ -16,8 +16,12 @@
 #include <vtkExtractEdges.h>
 #include <vtkLine.h>
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> BGLUndirectedGraph;
-typedef std::pair < int, int > Edge;
+struct vertex_info {
+    double x;
+    double y;
+    double z;
+};
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, vertex_info> BGLUndirectedGraph;
 
 BGLUndirectedGraph vtkGetInput (std::string path);
 BGLUndirectedGraph vtpGetInput (std::string path);
