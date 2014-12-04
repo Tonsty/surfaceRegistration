@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
 #include <unistd.h>
 
 #include "common/inputUtilities.h"
@@ -30,8 +27,15 @@ enum InputModes { VTK, VTP };
 int SRApplication( InputModes mode, std::string targetName, std::string templateName,
                   double maxDistance, double maxStiffness, double minStiffness, double stiffnessStep) {
     
-    vtkSmartPointer<vtkPolyData> dataTarget = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkPolyData> dataTemplate = vtkSmartPointer<vtkPolyData>::New();
+    // Convert to BGL undirected graph
+    
+    BGLUndirectedGraph dataTarget;
+    BGLUndirectedGraph dataTemplate;
+
+    clock_t start;
+    double duration;
+    
+    start = clock();
     
     switch (mode)
     {
@@ -49,76 +53,38 @@ int SRApplication( InputModes mode, std::string targetName, std::string template
         }
     }
     
-    int pointCountTarget = dataTarget->GetNumberOfPoints();
-    int pointCountTemplate = dataTemplate->GetNumberOfPoints();
+    duration = ( clock() - start ) / (double) CLOCKS_PER_SEC;
     
-    vtkSmartPointer<vtkPolyData> polydataTarget = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkPolyData> polydataTemplate = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkPolyData> transformedTemplate = vtkSmartPointer<vtkPolyData>::New();
+    std::cout<< "Duration of conversion: " << duration << " seconds" << std::endl;
     
-    vtkSmartPointer<vtkPoints> pointsTarget = vtkSmartPointer<vtkPoints>::New();
-    vtkSmartPointer<vtkPoints> pointsTemplate = vtkSmartPointer<vtkPoints>::New();
-    vtkSmartPointer<vtkPoints> transformedPointsTemplate = vtkSmartPointer<vtkPoints>::New();
+    // Do the PCA to both target and template?
     
-    double scaleFactor = applyPCA(pointCountTarget, pointCountTemplate, dataTarget, dataTemplate,
-                                  polydataTarget, polydataTemplate, transformedTemplate, maxDistance);
+    // Scale the meshes?
     
-    // Scale to [-1,1] Cube
+    // Build Johnson's All-Pairs Shortest Paths
     
-    polydataTarget = TransformScaleTranslate(polydataTarget, scaleFactor);
-    transformedTemplate = TransformScaleTranslate(transformedTemplate, scaleFactor);
-    polydataTemplate = TransformScaleTranslate(polydataTemplate, scaleFactor);
     
-    pointsTarget = polydataTarget->GetPoints();
-    pointsTemplate = polydataTemplate->GetPoints();
-    transformedPointsTemplate = transformedTemplate->GetPoints();
     
-    // Building the octree for the second time with the scaled mesh
+    // Use k-medoids
     
-    vtkSmartPointer<vtkPolyData> polydataResizedTargetOctree = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkOctreePointLocator> octreeResizedTarget = buildOctree(polydataResizedTargetOctree, pointsTarget, polydataTarget);
+    // Run the algorithm
     
-    vtkSmartPointer<vtkRenderWindow> window = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-    
-    visualizeWindow(polydataTarget, polydataTemplate, transformedTemplate, window, renderer);
-    
-    // Main Algorithm Loop
-    
-    // Extract edges
-    
-    vtkSmartPointer<vtkExtractEdges> extractEdges = vtkSmartPointer<vtkExtractEdges>::New();
-    switch (mode)
-    {
-        case VTK:
-        {
-            extractEdges->SetInputConnection(vtkGetSource(templateName)->GetOutputPort());
-            break;
-        }
-        case VTP:
-        {
-            extractEdges->SetInputConnection(vtpGetSource(templateName)->GetOutputPort());
-            break;
-        }
-    }
-    extractEdges->Update();
-    vtkCellArray* linesTemplate = extractEdges->GetOutput()->GetLines();
-    
-    mainAlgorithmLoop(maxStiffness, minStiffness, stiffnessStep, maxDistance,
-                      pointsTarget, transformedPointsTemplate,
-                      pointCountTemplate, octreeResizedTarget, linesTemplate, window);
-    
-    window->Finalize();
-    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
-    renWin->SetSize(1200, 800);
-    renWin->AddRenderer(renderer);
-    
-    vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    interactor->SetRenderWindow(renWin);
-    interactor->SetInteractorStyle(vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New());
-    
-    interactor->Initialize();
-    interactor->Start();
+//    vtkSmartPointer<vtkRenderWindow> window = vtkSmartPointer<vtkRenderWindow>::New();
+//    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+//    
+//    visualizeWindow(polydataTarget, polydataTemplate, transformedTemplate, window, renderer);
+//    
+//    window->Finalize();
+//    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
+//    renWin->SetSize(1200, 800);
+//    renWin->AddRenderer(renderer);
+//    
+//    vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//    interactor->SetRenderWindow(renWin);
+//    interactor->SetInteractorStyle(vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New());
+//    
+//    interactor->Initialize();
+//    interactor->Start();
     
     return 0;
 }

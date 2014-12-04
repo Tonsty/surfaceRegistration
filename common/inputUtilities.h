@@ -5,14 +5,21 @@
 #include <iostream>
 #include <string>
 
+#include <boost/config.hpp>
+#include <boost/graph/adjacency_list.hpp>
+
 #include <vtkSmartPointer.h>
 #include <vtkDataSetReader.h>
 #include <vtkXMLPolyDataReader.h>
 #include <vtkPolyData.h>
 
-vtkSmartPointer<vtkPolyData> vtkGetInput (std::string path);
-vtkSmartPointer<vtkPolyData> vtpGetInput (std::string path);
-vtkSmartPointer<vtkDataSetReader> vtkGetSource (std::string path);
-vtkSmartPointer<vtkXMLPolyDataReader> vtpGetSource (std::string path);
+#include <vtkExtractEdges.h>
+#include <vtkLine.h>
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> BGLUndirectedGraph;
+typedef std::pair < int, int > Edge;
+
+BGLUndirectedGraph vtkGetInput (std::string path);
+BGLUndirectedGraph vtpGetInput (std::string path);
 
 #endif

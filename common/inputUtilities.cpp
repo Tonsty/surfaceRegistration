@@ -1,6 +1,6 @@
 #include "inputUtilities.h"
 
-vtkSmartPointer<vtkPolyData> vtkGetInput (std::string path) {
+BGLUndirectedGraph vtkGetInput (std::string path) {
     const char* nameInput;
     
     nameInput = path.c_str();
@@ -10,10 +10,26 @@ vtkSmartPointer<vtkPolyData> vtkGetInput (std::string path) {
     source->SetFileName(nameInput);
     source->Update();
     
-    return source->GetPolyDataOutput();
+    const std::size_t V = source->GetPolyDataOutput()->GetNumberOfPoints();
+    
+    vtkSmartPointer<vtkExtractEdges> extractEdges = vtkSmartPointer<vtkExtractEdges>::New();
+    extractEdges->SetInputConnection(source->GetOutputPort());
+    extractEdges->Update();
+    
+    const std::size_t E = extractEdges->GetOutput()->GetNumberOfCells();
+    
+    BGLUndirectedGraph g(V);
+    
+    for(int i = 0; i < E; i++)
+    {
+        vtkSmartPointer<vtkLine> line = vtkLine::SafeDownCast(extractEdges->GetOutput()->GetCell(i));
+        add_edge(line->GetPointIds()->GetId(0), line->GetPointIds()->GetId(1), g);
+    }
+    
+    return g;
 }
 
-vtkSmartPointer<vtkPolyData> vtpGetInput (std::string path) {
+BGLUndirectedGraph vtpGetInput (std::string path) {
     const char* nameInput;
     
     nameInput = path.c_str();
@@ -23,32 +39,22 @@ vtkSmartPointer<vtkPolyData> vtpGetInput (std::string path) {
     source->SetFileName(nameInput);
     source->Update();
     
-    return source->GetOutput();
+    const std::size_t V = source->GetOutput()->GetNumberOfPoints();
     
-}
-
-vtkSmartPointer<vtkDataSetReader> vtkGetSource (std::string path) {
-    const char* nameInput;
+    vtkSmartPointer<vtkExtractEdges> extractEdges = vtkSmartPointer<vtkExtractEdges>::New();
+    extractEdges->SetInputConnection(source->GetOutputPort());
+    extractEdges->Update();
     
-    nameInput = path.c_str();
+    const std::size_t E = extractEdges->GetOutput()->GetNumberOfCells();
     
-    vtkSmartPointer<vtkDataSetReader> source = vtkSmartPointer<vtkDataSetReader>::New();
+    BGLUndirectedGraph g(V);
     
-    source->SetFileName(nameInput);
-    source->Update();
+    for(int i = 0; i < E; i++)
+    {
+        vtkSmartPointer<vtkLine> line = vtkLine::SafeDownCast(extractEdges->GetOutput()->GetCell(i));
+        add_edge(line->GetPointIds()->GetId(0), line->GetPointIds()->GetId(1), g);
+    }
     
-    return source;
-}
-
-vtkSmartPointer<vtkXMLPolyDataReader> vtpGetSource (std::string path) {
-    const char* nameInput;
+    return g;
     
-    nameInput = path.c_str();
-    
-    vtkSmartPointer<vtkXMLPolyDataReader> source = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-    
-    source->SetFileName(nameInput);
-    source->Update();
-    
-    return source;
 }

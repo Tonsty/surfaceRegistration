@@ -3,6 +3,8 @@ surfaceRegistration
 
 An implementation of the algorithm described in the article "Optimal Step Nonrigid ICP Algorithms for Surface Registration" by Brian Amberg, Sami Romdhani and Thomas Vetter
 
+Last working version: Final version of the lab code init commit / Oct 3
+
 Used libraries:
 
 Eigen 3.1.4
