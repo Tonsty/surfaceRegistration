@@ -1,3 +1,11 @@
+Important message!
+==================
+
+The repository is a incomplete implementation of the following paper. <br>
+Go to the complete implemenation 
+https://github.com/Tonsty/Non-Rigid-Registar/tree/master/src/optimal_nonrigid_icp
+
+
 surfaceRegistration
 ===================
 
